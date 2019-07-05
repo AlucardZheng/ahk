@@ -2,6 +2,11 @@
 #IfWinActive, ahk_class D3 Main Window Class ;仅在D3下有效
 
 ;黑人的问题在于按下变身之后有1秒延迟才能判断是否为黑人，导致非黑人代码也能触发
+;鼠标滚轮往上瞬移，往下停止宏，滚轮按下白人阶段移动走位
+;F2开启宏
+;回城，看技能回车也能停止宏
+;滚轮往上白人状态放黑洞
+
 
 SetKeyDelay,50
 SetMouseDelay,50
@@ -13,39 +18,96 @@ Height:=900
 Return
 
 v_E=0 ;脚本运行开关变量
-v_Enable = 0
+global v_Enable = 0
+global scolor =1
+global i =0 
+global sclolor_bef =0
 
 $F2:: 
 {
+i:=4
 v_E:=!v_E
 v_Enable := 0
 send {2}
 send {4}
-i=0
-WinGetPos,X,Y,Width, Height, A ;判断你的游戏窗口分辨率
-PixelGetColor, color, Ceil(Width*0.4412), Ceil(Height*0.9574) ;寻找你“4”技能图标位置
-scolor := SubStr(color, 3, 1) ;“4”技能位置没有图标的时候，颜色坐标第三个字符是1
-
 SetTimer, Label1, 600  ;动作条技能2键600毫秒连点，对应挑衅技能，600可改动
 SetTimer, MouseLButton, 150  ;鼠标左键150毫秒连点，150可改动，只有这里需要改动
-
-If (scolor=1 )
-{	
-	SetTimer, Label3, off   ;动作条技能2键600毫秒连点，对应挑衅技能，600可改动
-	send {2}
-	send {G up}
-}
-else
-{
-	SetTimer, Label3, 600  ;动作条技能2键600毫秒连点，对应挑衅技能，600可改动
-	send {G down}
-}
+SetTimer, CoreCire, 600   ;动作条技能2键600毫秒连点，对应挑衅技能，600可改动
 }
 
 Return
 
-Enter::  
-T::     
+
+$WheelUp::
+{
+
+SetTimer, MouseLButton, off  ;鼠标左键150毫秒连点，150可改动，只有这里需要改动
+WinGetPos,X,Y,Width, Height, A ;判断你的游戏窗口分辨率
+PixelGetColor, color, Ceil(Width*0.4412), Ceil(Height*0.9574) ;寻找你“4”技能图标位置
+scolor := SubStr(color, 3, 1) ;“4”技能位置没有图标的时候，颜色坐标第三个字符是1
+if(scolor==1)
+{
+	send {3}
+
+}
+else{
+	send {3}
+	;sleep 150
+	send {click right}
+}
+
+SetTimer, MouseLButton, 150  ;鼠标左键150毫秒连点，150可改动，只有这里需要改动
+}
+return
+
+CoreCire()
+{
+WinGetPos,X,Y,Width, Height, A ;判断你的游戏窗口分辨率
+PixelGetColor, color, Ceil(Width*0.4412), Ceil(Height*0.9574) ;寻找你“4”技能图标位置
+scolor := SubStr(color, 3, 1) ;“4”技能位置没有图标的时候，颜色坐标第三个字符是1
+
+If (scolor=1 ) ;黑人状态
+{	
+	if(v_Enable==0)
+	{
+		send {2} ；开启罩子
+		v_Enable:=1
+	}
+	send {G up}
+}
+if (scolor != sclolor_bef and scolor !=1) ;当状态位发生低位跳转时
+{
+	v_Enable:=0
+	send {click right}
+	sleep 50
+	send {3}
+	sclolor_bef := scolor ;调整判断符号	
+	sleep 150
+	PixelGetColor, color, Ceil(Width*0.4157), Ceil(Height*0.9574) ;寻找你“3”技能图标位置
+	scolor_check3 := SubStr(color, 3, 1) ;“3”技能位置没有图标的时候，颜色坐标第三个字符是1
+	if(scolor_check3!=1) ;3技能没cd就是说没释放出来
+	{
+		send {3}
+	}
+
+	sleep 50
+	PixelGetColor, color, Ceil(Width*0.5210), Ceil(Height*0.9574) ;寻找你“右键”技能图标位置
+	scolor_checkR := SubStr(color, 3, 1) ;“右键”技能位置没有图标的时候，颜色坐标第三个字符是1
+	if(scolor_checkR!=1) ;3技能没cd就是说没释放出来
+	{
+		send {click right}
+	}
+}
+if(scolor != sclolor_bef and scolor ==1) ;当状态位发生高位跳转时
+{
+	sclolor_bef := scolor
+}
+}
+return
+
+~WheelDown::
+~Enter::  
+~T::     
 ~S::      
 ~I::      
 ~M::      
@@ -66,9 +128,10 @@ Shundown()
 	SetTimer, MouseLButton, off  
 	SetTimer, MouseRButton, off     
 	Send {G up} 
-	return
+	SetTimer, CoreCire, off   ;动作条技能2键600毫秒连点，对应挑衅技能，600可改动
+	
 }
-
+return
 Label1:
 {
 Send {1} ;动作条技能1键对应按键
@@ -96,33 +159,11 @@ Return
 MouseLButton:
 {
 Click    ;点击鼠标左键，对应主要技能
-IfWinNotActive,暗黑破坏神III ;国服简体游戏端窗口切换关闭宏
-{
-SetTimer, Label1, off 
-SetTimer, Label2, off 
-SetTimer, Label3, off 
-SetTimer, Label4, off 
-SetTimer, MouseLButton, off 
-SetTimer, MouseRButton, off 
-Send {x up} 
-v_Enable=0
-}
 }
 Return
 
 MouseRButton:
 {
 Click Right ;点击鼠标右键，对应钢甲技能
-IfWinNotActive,暗黑破坏神III ;国服简体游戏端窗口切换关闭宏
-{
-SetTimer, Label1, off 
-SetTimer, Label2, off 
-SetTimer, Label3, off 
-SetTimer, Label4, off 
-SetTimer, MouseLButton, off 
-SetTimer, MouseRButton, off 
-Send {x up} 
-v_Enable=0
-}
 }
 Return
