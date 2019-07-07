@@ -1,4 +1,4 @@
-﻿#maxThreadsPerHotkey, 1 ;最大开启线程数为1
+﻿;#maxThreadsPerHotkey, 1 ;最大开启线程数为1
 #IfWinActive, ahk_class D3 Main Window Class ;仅在D3下有效
 
 ;黑人的问题在于按下变身之后有1秒延迟才能判断是否为黑人，导致非黑人代码也能触发
@@ -22,6 +22,7 @@ global v_Enable = 0
 global scolor =1
 global i =0 
 global sclolor_bef =0
+global v_Rbtn=0
 
 $F2:: 
 {
@@ -38,9 +39,10 @@ SetTimer, CoreCire, 600   ;动作条技能2键600毫秒连点，对应挑衅技�
 Return
 
 
-$WheelUp::
+;$WheelUp::
+$RButton::
 {
-
+/*
 SetTimer, MouseLButton, off  ;鼠标左键150毫秒连点，150可改动，只有这里需要改动
 WinGetPos,X,Y,Width, Height, A ;判断你的游戏窗口分辨率
 PixelGetColor, color, Ceil(Width*0.4412), Ceil(Height*0.9574) ;寻找你“4”技能图标位置
@@ -57,6 +59,22 @@ else{
 }
 
 SetTimer, MouseLButton, 150  ;鼠标左键150毫秒连点，150可改动，只有这里需要改动
+*/
+if(v_Rbtn==0)
+{
+	
+send {3}
+}
+else{
+	click right
+}
+
+}
+return
+
+$F11::
+{
+	v_Rbtn:=!v_Rbtn
 }
 return
 
@@ -167,3 +185,87 @@ MouseRButton:
 Click Right ;点击鼠标右键，对应钢甲技能
 }
 Return
+
+
+global v_Met=0
+global v_SH=0
+
+
+
+$F3::
+{
+	v_Met=1
+	labelMet:
+	sleep 12000
+	if(v_Met!=0)
+	{
+		SoundMet()
+	}
+	else{
+		goto labelMetEnd
+	}
+	sleep 4000
+	sleep 16000
+	sleep 16000
+	if(v_Met!=0)
+	{
+		SoundMet()
+	}
+	else{
+		goto labelMetEnd
+	}
+	sleep 16000
+	sleep 16000
+	if(v_Met!=0)
+	{
+		SoundMet()
+	}
+	else{
+		goto labelMetEnd
+	}
+	goto labelMet
+	labelMetEnd:
+}
+return
+
+$F4::
+{
+	v_Met=0
+}
+return
+
+$F5::
+{
+	v_SH=1
+	labelSH:
+	if(v_SH!=0)
+	{
+		SoundSH()
+	}
+	else{
+		goto labelSHEnd
+	}
+	sleep 11000
+	goto labelSH
+	labelSHEnd:
+}
+return
+
+$F6::
+{
+	v_SH=0
+}
+return
+
+SoundMet()
+{
+	SoundPlay, .\yunshizhunbei.wav
+	Return
+}
+
+
+SoundSH()
+{
+	SoundPlay, .\dunqiang.wav
+	Return
+}

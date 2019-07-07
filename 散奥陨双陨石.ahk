@@ -11,8 +11,8 @@
 ;白人站不住怎么办？巅峰点体力，保证血量80w
 ;双陨石要求更多cdr，目前没法测试
 ;黑人持续时间结束后炸一个陨石，出神目，然后等全能到点在砸第二个。要求:神目的持续时间够长
-;双黑人循环的陨石放法，火元素3/4开始放陨石两颗，全能循环开始第一次奥元素炸陨石，第二次奥元素在黑人阶段，第三次奥元素砸单陨石，第四次黑人阶段，第五次白人阶段跳过，第六次砸双陨石
-
+;双黑人循环的陨石放法，火元素3/4开始放陨石两颗，全能循环开始第一次奥元素炸陨石，第二次奥元素在黑人阶段，第三次奥元素砸单陨石，第四次黑人阶段，第五次砸双陨石，然后循环
+;还需要减少1.3秒
 
 SetKeyDelay,50
 SetMouseDelay,50
@@ -29,6 +29,7 @@ global scolor =1
 global i =0 
 global color
 global oneclick=1	;标志位，让F2的循环唯一
+global oneclick1=1	;标志位，让F3的循环唯一
 
 $F2:: 
 {
@@ -38,6 +39,34 @@ if(oneclick==0 and v_E==0)
 }
 v_E=0
 oneclick=0
+main(1)
+}
+Return
+
+$F3::
+{
+if(oneclick1==0 and v_E==0)
+{
+	return
+}
+v_E=0
+oneclick1=0
+main(0)
+	
+}
+
+
+return
+
+main(flag)
+{
+	if(flag==1)
+	{
+		goto Mylabel1
+	}
+	else{
+		goto MylabelC
+	}
 Mylabel1:
 	send {3}		;火全能走完开始技能
 	send {1 down}
@@ -95,9 +124,10 @@ Mylabel1:
 	{
 		return
 	}
-	sleep 10100		;攻击出发黄道减黑人cd
+	sleep 8000		;攻击出发黄道减黑人cd
 	send {4 up}
-	;第二次循环，单陨石
+	;第二次循环，单陨石,电全能走一半开始放技能
+MylabelC:
 	send {3}
 	sleep 600
 	send {1 down}
@@ -125,28 +155,16 @@ Mylabel1:
 	{
 		return
 	}
-	sleep 10100		;攻击出发黄道减黑人cd
+	sleep 6300		;攻击出发黄道减黑人cd
 	send {4 up}
 	if(v_E==1)
 	{
 		return
 	}
-	sleep 4000
-	sleep 6000
+	;sleep 4000
+	;sleep 6000
 	goto Mylabel1
 }
-
-Return
-
-
-$WheelUp::
-{
-
-	send {3}
-
-}
-return
-
 
 ~WheelDown::
 ~Enter::  
@@ -163,49 +181,8 @@ Shundown()
 Return
 
 Shundown()
-{   
-	SetTimer, Label1, off  
-	SetTimer, Label2, off  
-	SetTimer, Label3, off  
-	SetTimer, Label4, off  
-	SetTimer, MouseLButton, off  
-	SetTimer, MouseRButton, off   
+{    
 	v_E=1
 	oneclick=1
+	oneclick1=1
 }
-
-Label1:
-{
-Send {1} ;动作条技能1键对应按键
-Return
-}
-
-Label2:
-{
-Send {2} ;动作条技能2键对应按键
-Return
-}
-
-Label3:
-{
-Send {3} ;动作条技能3键对应按键
-Return
-}
-
-Label4:
-{
-Send {4}  ;动作条技能4键对应按键
-Return
-}
-
-MouseLButton:
-{
-Click    ;点击鼠标左键，对应主要技能
-}
-Return
-
-MouseRButton:
-{
-Click Right ;点击鼠标右键，对应钢甲技能
-}
-Return

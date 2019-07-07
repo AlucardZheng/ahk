@@ -36,10 +36,6 @@ $v::	;ÏÂÒ»¼¯
 	Oporation()
 	sleep 150
 	
-	xRay := width * xAD
-	yRay := height*0.983
-	MouseMove xRay,yRay
-	Oporation()
 }
 return
 Oporation()
